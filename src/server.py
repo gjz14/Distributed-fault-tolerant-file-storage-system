@@ -3,6 +3,7 @@ from xmlrpc.server import SimpleXMLRPCRequestHandler
 from socketserver import ThreadingMixIn
 from hashlib import sha256
 import argparse
+import threading
 import time
 import random
 import xmlrpc.client
@@ -121,7 +122,9 @@ def requestVote(serverid, term):
     global current_term
     global status
     try:
-        response,external_term = xmlrpc.client.ServerProxy("http://"+serverid).answerVote(term)
+        c = xmlrpc.client.ServerProxy("http://"+serverid)
+        response,external_term = c.surfstore.answerVote(term)
+        print(serverid, response, external_term)
         if response:
             vote_counter += 1
 	# downgrade a candidate node to a follower node
@@ -155,7 +158,7 @@ def appendEntries(serverid, term, fileinfomap):
     """Updates fileinfomap to match that of the leader"""
     global staus
     global current_term
-    response, external_term = xmlrpc.client.ServerProxy("http://"+serverid).answerAppendEntries(term,fileinfomap)
+    response, external_term = xmlrpc.client.ServerProxy("http://"+serverid).surfstore.answerAppendEntries(term,fileinfomap)
 
     #if response:
 	# do nothing
@@ -224,8 +227,12 @@ def raft():
             timer.set_heartbeat_timeout(777)
             if timer.timecount() > timer.timeout:
                 timer.reset()
+                thread_list = []
                 for s in serverlist:
-                    appendEntries(s, current_term, fileinfomap)
+                    thread_list.append(threading.Thread(target=appendEntries, args = (s, current_term, fileinfomap)))
+                    thread_list[-1].start()
+                for t in thread_list:
+                    t.join()
         else:
 	    
 	    # election time out 
@@ -236,9 +243,14 @@ def raft():
                 current_term += 1
                 vote_counter = 1 # vote for its self
                 print("I am "+str(host)+":"+str(port)+",  I am requesting for vote, my current term is: "+ str(current_term))
+                thread_list = []
                 for s in serverlist:
-                    requestVote(s,current_term)
+                    thread_list.append(threading.Thread(target=requestVote, args=(s,current_term)))
+                    thread_list[-1].start()
+                for t in thread_list:
+                    t.join()
 		# get majority votes, become leader
+                print(num_servers, vote_counter)
                 if vote_counter > num_servers/2:
                     status = 2 # make it a leader
                     print("A new leader "+str(host)+":"+str(port) + " in term: "+ str(current_term))
@@ -289,10 +301,14 @@ if __name__ == "__main__":
         server.register_function(requestVote,"surfstore.requestVote")
         server.register_function(appendEntries,"surfstore.appendEntries")
         server.register_function(tester_getversion,"surfstore.tester_getversion")
+
+        server.register_function(answerVote,"surfstore.answerVote")
+        server.register_function(answerAppendEntries,"surfstore.answerAppendEntries")
         print("Started successfully.")
         print("Accepting requests. (Halt program to stop.)")
 	
-        raft()
+        t = threading.Thread(target = raft, )
+        t.start()
 
         server.serve_forever()
     except Exception as e:
