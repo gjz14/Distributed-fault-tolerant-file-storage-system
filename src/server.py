@@ -4,6 +4,7 @@ from socketserver import ThreadingMixIn
 from hashlib import sha256
 import argparse
 import time
+import random
 import xmlrpc.client
 
 class RequestHandler(SimpleXMLRPCRequestHandler):
@@ -13,19 +14,19 @@ class threadedXMLRPCServer(ThreadingMixIn, SimpleXMLRPCServer):
     pass
 
 class TimeHandler():
-    def __init__:
-	self.election_lower = 1500
-	self.election_higher = 3000
-	self.start = int(time.time()*1000)
-	self.timeout = 0
+    def __init__(self):
+        self.election_lower = 1500
+        self.election_higher = 3000
+        self.start = int(time.time()*1000)
+        self.timeout = 0
     def timecount(self):
-	return int(time.time()*1000 - self.start)
+        return int(time.time()*1000 - self.start)
     def reset(self):
-	self.start = int(time.time()*1000)
+        self.start = int(time.time()*1000)
     def set_election_timeout(self):
-	self.timeout = random.randint(self.election_lower,slef.election_higher)
+        self.timeout = random.randint(self.election_lower,self.election_higher)
     def set_heartbeat_timeout(self, interval):
-	self.timeout = interval
+        self.timeout = interval
 
 
 # A simple ping, returns true
@@ -79,7 +80,10 @@ def updatefile(filename, version, hashlist):
 def isLeader():
     """Is this metadata store a leader?"""
     print("IsLeader()")
-    return status==2
+    if status==2:
+        return True
+    else:
+        return False
 
 # "Crashes" this metadata store
 # Until Restore() is called, the server should reply to all RPCs
@@ -117,15 +121,15 @@ def requestVote(serverid, term):
     global current_term
     global status
     try:
-	response,external_term = xmlrpc.client.ServerProxy("http://"+serverid).answerVote(term)
-	if response:
-	    vote_counter += 1
+        response,external_term = xmlrpc.client.ServerProxy("http://"+serverid).answerVote(term)
+        if response:
+            vote_counter += 1
 	# downgrade a candidate node to a follower node
-	elif external_term > current_term:
-	    current_term = external_term
-	    status = 0
+        elif external_term > current_term:
+            current_term = external_term
+            status = 0
     except:
-	pass
+        pass
 
     return True
 
@@ -136,15 +140,15 @@ def answerVote(candidate_term):
     timer.reset()
     timer.set_election_timeout()
     try:
-	if current_term < candidate_term:
-	    current_term = candidate_term
-	    status = 0
-	    return True, current_term
-	else:
-	    print("I won't vote")
-	    return False, current_term
+        if current_term < candidate_term:
+            current_term = candidate_term
+            status = 0
+            return True, current_term
+        else:
+            print("I won't vote")
+            return False, current_term
     except:
-	pass 
+        pass 
 
 # Updates fileinfomap
 def appendEntries(serverid, term, fileinfomap):
@@ -153,13 +157,13 @@ def appendEntries(serverid, term, fileinfomap):
     global current_term
     response, external_term = xmlrpc.client.ServerProxy("http://"+serverid).answerAppendEntries(term,fileinfomap)
 
-    if response:
+    #if response:
 	# do nothing
-    else:
+    if response == False:
 	# downgrade a leader node to a follower node
-	if current_term < external_term:
-	    current_term = external_term
-	    status = 0
+        if current_term < external_term:
+            current_term = external_term
+            status = 0
 
 	# TODO: If the update not success, what should happen
 
@@ -167,7 +171,7 @@ def appendEntries(serverid, term, fileinfomap):
 
 def answerAppendEntries(leader_term,fileinfomap):
     if current_term > leader_term:
-	return False, current_term
+        return False, current_term
 
     # reset the election timeout
     timer.reset()
@@ -211,32 +215,33 @@ def raft():
     global status
     global current_term
     global vote_counter
-    global timer = TimeHandler()
+    global timer 
+    timer = TimeHandler()
     timer.set_election_timeout()
     while True:
 	# if it is a leader, just send heartbeats
-	if status==2:
-	    timer.set_heartbeat_timeout(777)
-            if timer.timecount > timer.timeout:
-		timer.reset()
-		for s in serverlist:
-		    appendEntries(s, current_term, fileinfomap)
-	else:
+        if status==2:
+            timer.set_heartbeat_timeout(777)
+            if timer.timecount() > timer.timeout:
+                timer.reset()
+                for s in serverlist:
+                    appendEntries(s, current_term, fileinfomap)
+        else:
 	    
 	    # election time out 
-	    if timer.timecount > timer.timeout:
-		timer.reset()
-	        timer.set_election_timeout()
-		status = 1 # make it an candidate
-		current_term += 1
-		vote_counter = 1 # vote for its self
-		print("I am "+str(host)+":"+str(port)+",  I am requesting for vote, my current term is: "+ str(current_term))
-		for s in serverlist:
-		    requestVote(s,current_term)
+            if timer.timecount() > timer.timeout:
+                timer.reset()
+                timer.set_election_timeout()
+                status = 1 # make it an candidate
+                current_term += 1
+                vote_counter = 1 # vote for its self
+                print("I am "+str(host)+":"+str(port)+",  I am requesting for vote, my current term is: "+ str(current_term))
+                for s in serverlist:
+                    requestVote(s,current_term)
 		# get majority votes, become leader
-		if vote_counter > num_servers/2:
-		    status = 2 # make it a leader
-		    print("A new leader "+str(host)+":"+str(port) + " in term: "+ str(current_term))
+                if vote_counter > num_servers/2:
+                    status = 2 # make it a leader
+                    print("A new leader "+str(host)+":"+str(port) + " in term: "+ str(current_term))
 	
 if __name__ == "__main__":
     try:
@@ -256,7 +261,7 @@ if __name__ == "__main__":
         maxnum, host, port = readconfig(config, servernum)
 
 
-        hashmap = dict();
+        hashmap = dict()
 
         fileinfomap = dict()
 
@@ -264,10 +269,10 @@ if __name__ == "__main__":
         print(host, port)
         server = threadedXMLRPCServer((host, port), requestHandler=RequestHandler)
 	# Init variables
-	num_servers = len(serverlist)+1
-	status = 0 # 0: follwer, 1: candidate, 2: leader
-	is_crashed = False
-	current_term = 0
+        num_servers = len(serverlist)+1
+        status = 0 # 0: follwer, 1: candidate, 2: leader
+        is_crashed = False
+        current_term = 0
 	
         server.register_introspection_functions()
         server.register_function(ping,"surfstore.ping")
@@ -287,7 +292,7 @@ if __name__ == "__main__":
         print("Started successfully.")
         print("Accepting requests. (Halt program to stop.)")
 	
-	raft()
+        raft()
 
         server.serve_forever()
     except Exception as e:
