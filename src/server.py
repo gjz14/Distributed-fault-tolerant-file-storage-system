@@ -113,8 +113,10 @@ def updatefile(filename, version, hashlist):
 
         if version != fileinfomap[filename][0] + 1:
             return False
-
-        fileinfomap[filename] = [fileinfomap[filename][0] + 1, hashlist]
+        if filename not in fileinfomap:
+            fileinfomap[filename] = [1, hashlist]
+        else:
+            fileinfomap[filename] = [fileinfomap[filename][0] + 1, hashlist]
         log.append([current_term, [2, filename, version, hashlist]])
 
         # block until the majority of nodes alive

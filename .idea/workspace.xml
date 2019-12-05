@@ -14,7 +14,7 @@
         <entry file="file://$PROJECT_DIR$/src/server.py">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="117">
-              <caret line="330" column="16" lean-forward="true" selection-start-line="330" selection-start-column="16" selection-end-line="330" selection-end-column="16" />
+              <caret line="328" column="8" selection-start-line="328" selection-start-column="4" selection-end-line="328" selection-end-column="8" />
               <folding>
                 <element signature="e#0#44#0" expanded="true" />
                 <element signature="e#1093#1191#0" />
@@ -94,7 +94,6 @@
       <find>2</find>
       <find>timer</find>
       <find>updatef</find>
-      <find>updatefile</find>
       <find>raft</find>
       <find>print</find>
       <find>test</find>
@@ -104,6 +103,7 @@
       <find>status</find>
       <find>isleader</find>
       <find>fileinfomap</find>
+      <find>updatefile</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -219,18 +219,18 @@
       <updated>1575426430478</updated>
       <workItem from="1575426431729" duration="340000" />
       <workItem from="1575426778068" duration="223000" />
-      <workItem from="1575427036553" duration="49098000" />
+      <workItem from="1575427036553" duration="49427000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="49661000" />
+    <option name="totallyTimeSpent" value="49990000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="1" y="23" width="1280" height="709" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.18659128" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.18659128" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
@@ -244,7 +244,7 @@
       <window_info anchor="bottom" id="Version Control" order="8" />
       <window_info anchor="bottom" id="Database Changes" order="9" />
       <window_info anchor="bottom" id="Event Log" order="10" side_tool="true" />
-      <window_info anchor="bottom" id="Terminal" order="11" visible="true" weight="0.29983792" />
+      <window_info active="true" anchor="bottom" id="Terminal" order="11" visible="true" weight="0.29983792" />
       <window_info anchor="bottom" id="Python Console" order="12" />
       <window_info anchor="right" id="Commander" order="0" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
@@ -311,7 +311,7 @@
     <entry file="file://$PROJECT_DIR$/src/server.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="117">
-          <caret line="330" column="16" lean-forward="true" selection-start-line="330" selection-start-column="16" selection-end-line="330" selection-end-column="16" />
+          <caret line="328" column="8" selection-start-line="328" selection-start-column="4" selection-end-line="328" selection-end-column="8" />
           <folding>
             <element signature="e#0#44#0" expanded="true" />
             <element signature="e#1093#1191#0" />
