@@ -20,8 +20,8 @@ class threadedXMLRPCServer(ThreadingMixIn, SimpleXMLRPCServer):
 
 class TimeHandler():
     def __init__(self):
-        self.election_lower = 1500
-        self.election_higher = 3000
+        self.election_lower = 500
+        self.election_higher = 1000
         self.start = int(time.time() * 1000)
         self.timeout = 0
 
@@ -110,7 +110,11 @@ def updatefile(filename, version, hashlist):
                 return True
             pass
         print("UpdateFile(" + filename + ")")
-        fileinfomap[filename] = [version, hashlist]
+
+        if version != fileinfomap[filename][0] + 1:
+            return False
+
+        fileinfomap[filename] = [fileinfomap[filename][0] + 1, hashlist]
         log.append([current_term, [2, filename, version, hashlist]])
 
         # block until the majority of nodes alive
@@ -382,7 +386,7 @@ def raft():
     while True:
         # if it is a leader, just send heartbeats
         if status == 2:
-            timer.set_heartbeat_timeout(777)
+            timer.set_heartbeat_timeout(250)
 
             if timer.timecount() > timer.timeout:
                 timer.reset()

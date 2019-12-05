@@ -13,8 +13,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/server.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="390">
-              <caret line="210" column="22" selection-start-line="210" selection-start-column="12" selection-end-line="210" selection-end-column="22" />
+            <state relative-caret-position="117">
+              <caret line="330" column="16" lean-forward="true" selection-start-line="330" selection-start-column="16" selection-end-line="330" selection-end-column="16" />
               <folding>
                 <element signature="e#0#44#0" expanded="true" />
                 <element signature="e#1093#1191#0" />
@@ -34,8 +34,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/tester.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="404">
-              <caret line="22" column="21" selection-start-line="22" selection-start-column="21" selection-end-line="22" selection-end-column="21" />
+            <state relative-caret-position="149">
+              <caret line="20" column="8" selection-start-line="20" selection-start-column="8" selection-end-line="20" selection-end-column="8" />
               <folding>
                 <element signature="e#0#15#0" expanded="true" />
               </folding>
@@ -64,8 +64,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/config.txt">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="133">
-              <caret line="7" selection-start-line="7" selection-end-line="7" />
+            <state>
+              <caret column="4" selection-start-column="4" selection-end-column="4" />
             </state>
           </provider>
         </entry>
@@ -74,9 +74,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>upda</find>
-      <find>fileinfomap</find>
-      <find>is_crashed</find>
       <find>is_update_file</find>
       <find>xmlrpc.client.ServerProxy</find>
       <find>last</find>
@@ -98,12 +95,15 @@
       <find>timer</find>
       <find>updatef</find>
       <find>updatefile</find>
-      <find>isleader</find>
       <find>raft</find>
       <find>print</find>
       <find>test</find>
       <find>isLeader</find>
       <find>status = 0</find>
+      <find>crash</find>
+      <find>status</find>
+      <find>isleader</find>
+      <find>fileinfomap</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -219,12 +219,12 @@
       <updated>1575426430478</updated>
       <workItem from="1575426431729" duration="340000" />
       <workItem from="1575426778068" duration="223000" />
-      <workItem from="1575427036553" duration="47509000" />
+      <workItem from="1575427036553" duration="49098000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="48072000" />
+    <option name="totallyTimeSpent" value="49661000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="1" y="23" width="1280" height="709" extended-state="6" />
@@ -277,14 +277,14 @@
     <entry file="file://$PROJECT_DIR$/build.sh">
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
-    <entry file="file://$PROJECT_DIR$/run-server.sh">
+    <entry file="file://$PROJECT_DIR$/run-tester.sh">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="57">
           <caret line="3" lean-forward="true" selection-start-line="3" selection-end-line="3" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/run-tester.sh">
+    <entry file="file://$PROJECT_DIR$/run-server.sh">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="57">
           <caret line="3" lean-forward="true" selection-start-line="3" selection-end-line="3" />
@@ -293,15 +293,15 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/config.txt">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="133">
-          <caret line="7" selection-start-line="7" selection-end-line="7" />
+        <state>
+          <caret column="4" selection-start-column="4" selection-end-column="4" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/tester.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="404">
-          <caret line="22" column="21" selection-start-line="22" selection-start-column="21" selection-end-line="22" selection-end-column="21" />
+        <state relative-caret-position="149">
+          <caret line="20" column="8" selection-start-line="20" selection-start-column="8" selection-end-line="20" selection-end-column="8" />
           <folding>
             <element signature="e#0#15#0" expanded="true" />
           </folding>
@@ -310,8 +310,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/server.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="390">
-          <caret line="210" column="22" selection-start-line="210" selection-start-column="12" selection-end-line="210" selection-end-column="22" />
+        <state relative-caret-position="117">
+          <caret line="330" column="16" lean-forward="true" selection-start-line="330" selection-start-column="16" selection-end-line="330" selection-end-column="16" />
           <folding>
             <element signature="e#0#44#0" expanded="true" />
             <element signature="e#1093#1191#0" />

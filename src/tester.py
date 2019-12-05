@@ -20,7 +20,7 @@ if __name__ == "__main__":
 		# client.surfstore.restore()
 		# client.surfstore.getfileinfomap()
 		# client.surfstore.updatefile("Test.txt", 4, [5,2,3])
-		client.surfstore.tester_getversion("Test.txt")
+		# client.surfstore.tester_getversion("Test.txt")
 
 	except Exception as e:
 		print("Client: " + str(e))
