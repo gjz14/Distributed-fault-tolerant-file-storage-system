@@ -323,10 +323,7 @@ def answerAppendEntries(leader_term, leader_fileinfomap, prev_log_index, prev_lo
 
 
 def tester_getversion(filename):
-    if filename not in fileinfomap:
-        return 1
-    else:
-        return fileinfomap[filename][0]
+    return fileinfomap[filename][0]
 
 
 def get_commit_index():
@@ -382,7 +379,7 @@ def raft():
     while True:
         # if it is a leader, just send heartbeats
         if status == 2:
-            timer.set_heartbeat_timeout(250)
+            timer.set_heartbeat_timeout(150)
 
             if timer.timecount() > timer.timeout:
                 timer.reset()
