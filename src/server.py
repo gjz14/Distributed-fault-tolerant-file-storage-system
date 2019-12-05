@@ -72,24 +72,43 @@ def hasblocks(hashlist):
 
 # Retrieves the server's FileInfoMap
 def getfileinfomap():
+    global majority_live
     """Gets the fileinfo map"""
-    print("GetFileInfoMap()")
 
-    log.append([current_term, [1]])
-    return fileinfomap
+    if not isLeader():
+        raise Exception("Not the leader")
+    else:
+        # block if the leader is crashed
+        while isCrashed():
+            pass
+        print("GetFileInfoMap()")
+        log.append([current_term, [1]])
+
+        # block until the majority of nodes alive alive
+        while majority_live < (1 + num_servers) / 2:
+            pass
+        print("successful get rid of block!!!")
+        return fileinfomap
 
 
 # Update a file's fileinfo entry
 def updatefile(filename, version, hashlist):
     global current_term
+    global majority_live
     """Updates a file's fileinfo entry"""
     if not isLeader():
         raise Exception("Not the leader")
     else:
+        # block if the leader is crashed
+        while isCrashed():
+            pass
         print("UpdateFile(" + filename + ")")
-
         fileinfomap[filename] = [version, hashlist]
         log.append([current_term, [2, filename, version, hashlist]])
+
+        # block until the majority of nodes alive
+        while majority_live < (1 + num_servers) / 2:
+            pass
         return True
 
 def updatefile_follower(filename, version, hashlist):
@@ -170,7 +189,7 @@ def requestVote(serverid, term):
 
 def answerVote(candidate_term):
     if is_crashed:
-        raise Exception("Crash Error")
+        return False, -1
     global current_term
     global timer
     global status
@@ -201,6 +220,7 @@ def appendEntries(serverid, term, fileinfomap, i):
     global match_index
     global next_index
     global commit_index
+    global majority_live
     entries = log[next_index[i]:]
     prev_log_index = next_index[i] - 1           # TODO: Not sure
     prev_log_term = log[prev_log_index][0]
@@ -212,7 +232,8 @@ def appendEntries(serverid, term, fileinfomap, i):
                                 prev_log_term,
                                 entries,
                                 commit_index)
-
+        if external_term == -1:   # follower is crashed
+            return False
         if response and entries != 0:
             # TODO: update nextIndex and matchIndex for the follower i
             match_index[i] = len(log) - 1
@@ -241,11 +262,12 @@ def appendEntries(serverid, term, fileinfomap, i):
         print("Leader log: ", log)
     except:
         pass
+    majority_live += 1
     return True
 
 
 def answerAppendEntries(leader_term, leader_fileinfomap, prev_log_index, prev_log_term, entries, leader_commit):
-    # When crashed, use term to label that server is crashed
+    # When crashed, use term == -1 to label that server is crashed
     if is_crashed:
         return False, -1
 
@@ -337,6 +359,7 @@ def readconfig(config, servernum):
 
 def raft():
     global status
+    global majority_live
     global current_term
     global vote_counter
     global timer
@@ -351,6 +374,7 @@ def raft():
             if timer.timecount() > timer.timeout:
                 timer.reset()
                 thread_list = []
+                majority_live = 0
                 for i, s in enumerate(serverlist):
                     thread_list.append(threading.Thread(target=appendEntries, args=(s, current_term, fileinfomap, i)))
                     thread_list[-1].start()
