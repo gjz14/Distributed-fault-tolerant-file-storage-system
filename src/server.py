@@ -74,20 +74,31 @@ def hasblocks(hashlist):
 def getfileinfomap():
     """Gets the fileinfo map"""
     print("GetFileInfoMap()")
+
     log.append([current_term, [1]])
     return fileinfomap
 
 
 # Update a file's fileinfo entry
 def updatefile(filename, version, hashlist):
+    global current_term
     """Updates a file's fileinfo entry"""
     if not isLeader():
-        raise ValueError("Not the leader")
+        raise Exception("Not the leader")
     else:
         print("UpdateFile(" + filename + ")")
+
         fileinfomap[filename] = [version, hashlist]
         log.append([current_term, [2, filename, version, hashlist]])
         return True
+
+def updatefile_follower(filename, version, hashlist):
+    """Updates a file's fileinfo entry"""
+
+    print("follower UpdateFile(" + filename + ")")
+    fileinfomap[filename] = [version, hashlist]
+    print(fileinfomap)
+    return True
 
 
 # PROJECT 3 APIs below
@@ -136,6 +147,8 @@ def isCrashed():
 # Requests vote from this server to become the leader
 def requestVote(serverid, term):
     """Requests vote to be the leader"""
+    if is_crashed:
+        raise Exception("Crash Error")
     global vote_counter
     global current_term
     global status
@@ -156,12 +169,15 @@ def requestVote(serverid, term):
 
 
 def answerVote(candidate_term):
+    if is_crashed:
+        raise Exception("Crash Error")
     global current_term
     global timer
     global status
     # reset the election timeout
     timer.reset()
     timer.set_election_timeout()
+
     try:
         if current_term < candidate_term:
             current_term = candidate_term
@@ -178,75 +194,95 @@ def answerVote(candidate_term):
 
 def appendEntries(serverid, term, fileinfomap, i):
     """Updates fileinfomap to match that of the leader"""
+    if is_crashed:
+        raise Exception("Crash Error")
     global status
     global current_term
     global match_index
     global next_index
     global commit_index
     entries = log[next_index[i]:]
-    prev_log_index = next_index[i]
-    prev_log_term = log[next_index[i]][0]
+    prev_log_index = next_index[i] - 1           # TODO: Not sure
+    prev_log_term = log[prev_log_index][0]
+    try:
+        response, external_term = xmlrpc.client.ServerProxy("http://" + serverid).surfstore.\
+            answerAppendEntries(term,
+                                fileinfomap,
+                                prev_log_index,
+                                prev_log_term,
+                                entries,
+                                commit_index)
 
-    response, external_term = xmlrpc.client.ServerProxy("http://" + serverid).surfstore.answerAppendEntries(term,
-                                                                                                            fileinfomap,
-                                                                                                            serverid,
-                                                                                                            prev_log_index,
-                                                                                                            prev_log_term,
-                                                                                                            entries,
-                                                                                                            commit_index)
+        if response and entries != 0:
+            # TODO: update nextIndex and matchIndex for the follower i
+            match_index[i] = len(log) - 1
+            next_index[i] = len(log)
 
-    # Control commit_index
-    N = commit_index + 1
-    while N < len(log):
-        flag = 0
-        for index in match_index:
-            if index >= N:
-                flag += 1
-        if flag >= len(match_index) / 2 and log[N][0] ==current_term:
-            commit_index = N
+            # Control commit_index
+            N = commit_index + 1
+            while N < len(log):
+                flag = 0
+                for index in match_index:
+                    if index >= N:
+                        flag += 1
+                if flag >= len(match_index) / 2 and log[N][0] == current_term:
+                    commit_index = N
+                    break
+                N += 1
 
-    if response:
-        for key, value in fileinfomap.items():
-            xmlrpc.client.ServerProxy("http://" + serverid).surfstore.updatefile(key, value[0], value[1])
-
-    if not response:
-        # downgrade a leader node to a follower node
-        if current_term < external_term:
-            current_term = external_term
-            status = 0
-
-    # TODO: If the update not success, what should happen: because of log inconsistency: decrement nextIndex and retry
-
+        if not response:
+            # downgrade a leader node to a follower node
+            if current_term < external_term:
+                print("I am not leader now!!!!")
+                current_term = external_term
+                status = 0
+            else:
+                next_index[i] -= 1
+        print("Leader log: ", log)
+    except:
+        pass
     return True
 
 
-def answerAppendEntries(leader_term, fileinfomap, serverid, prev_log_index, prev_log_term, entries, leader_commit):
+def answerAppendEntries(leader_term, leader_fileinfomap, prev_log_index, prev_log_term, entries, leader_commit):
+    # When crashed, use term to label that server is crashed
+    if is_crashed:
+        return False, -1
+
     global commit_index
     global log
 
+    if current_term > leader_term:
+        return False, current_term
+
+    if log[prev_log_index][0] != prev_log_term:
+        return False, current_term
+
     if len(entries) != 0:
-        if current_term > leader_term:
-            return False, current_term
-
-        if log[prev_log_index][0] != prev_log_term:
-            return False, current_term
-
+        print("ready to update fileinfomap as a follower "+str(leader_fileinfomap))
+        has_conflict = False
         for i in range(len(entries)):
-            if prev_log_index + i < len(log) and log[prev_log_index + i][0] != entries[i][0]:
-                log[prev_log_index + i:] = list()
-                for j in range(i, len(entries)):
-                    log.append(entries[j])
-                break
+            if prev_log_index + 1 + i < len(log):
+                if log[prev_log_index + 1 + i][0] != entries[i][0]:
+                    has_conflict = True
+                    log[prev_log_index + 1 + i:] = list()
+                    for j in range(i, len(entries)):
+                        log.append(entries[j])
+                    break
+
+        if not has_conflict:
+            print("no conflict")
+            log[prev_log_index + 1:] = list()
+            log.extend(entries)
 
         if leader_commit > commit_index:
-            commit_index = min(leader_commit, len(log))
+            commit_index = min(leader_commit, len(log) - 1)
 
-        # TODO: updates fileinfomap
-        for key, value in fileinfomap.items():
-            xmlrpc.client.ServerProxy("http://" + serverid).surfstore.updatefile(key, value[0], value[1])
+        for key, value in leader_fileinfomap.items():
+            updatefile_follower(key, value[0], value[1])
 
-        print(fileinfomap)
-
+        print("update finished as a follower " + str(leader_fileinfomap))
+    print("Follower log: ", log)
     # reset the election timeout
     timer.reset()
     timer.set_election_timeout()
@@ -267,7 +303,10 @@ def reset_next_and_match_index(n, commit_index):
     global match_index
     global next_index
     match_index = [0 for _ in range(n)]
+    print(match_index)
     next_index = [commit_index for _ in range(n)]
+
+    print(next_index)
 
 
 # Reads the config file and return host, port and store list of other servers
@@ -342,12 +381,11 @@ def raft():
                     print("A new leader " + str(host) + ":" + str(port) + " in term: " + str(current_term))
                     #
                     n = len(serverlist)
-                    serverid = str(host) + ":" + str(port)
-                    new_commit_index = xmlrpc.client.ServerProxy(
-                        "http://" + serverid).surfstore.get_commit_index()
-                    xmlrpc.client.ServerProxy(
-                        "http://" + serverid).surfstore.reset_next_and_match_index(n, new_commit_index)
 
+                    new_commit_index = get_commit_index()
+                    reset_next_and_match_index(n, new_commit_index)
+
+                    print("FiNISHed!!!!")
 
 if __name__ == "__main__":
     try:
@@ -374,7 +412,7 @@ if __name__ == "__main__":
         log.append([1, []])
         last_applied = 0
         commit_index = 0
-        # read: 1, write: 2
+        # value of log[i][2][0]: read: 1, write: 2
 
         # For leader
         next_index = list()

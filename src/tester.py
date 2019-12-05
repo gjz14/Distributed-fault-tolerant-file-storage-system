@@ -18,7 +18,8 @@ if __name__ == "__main__":
 		client.surfstore.isCrashed()
 		client.surfstore.crash()
 		client.surfstore.restore()
-		client.surfstore.updatefile("Test.txt", 3, [1,2,3])
+		# client.surfstore.getfileinfomap()
+		client.surfstore.updatefile("Test.txt", 4, [5,2,3])
 		client.surfstore.tester_getversion("Test.txt")
 
 	except Exception as e:
