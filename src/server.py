@@ -180,6 +180,9 @@ def appendEntries(serverid, term, fileinfomap, i):
     """Updates fileinfomap to match that of the leader"""
     global status
     global current_term
+    global match_index
+    global next_index
+    global commit_index
     entries = log[next_index[i]:]
     prev_log_index = next_index[i]
     prev_log_term = log[next_index[i]][0]
@@ -191,6 +194,17 @@ def appendEntries(serverid, term, fileinfomap, i):
                                                                                                             prev_log_term,
                                                                                                             entries,
                                                                                                             commit_index)
+
+    # Control commit_index
+    N = commit_index + 1
+    while N < len(log):
+        flag = 0
+        for index in match_index:
+            if index >= N:
+                flag += 1
+        if flag >= len(match_index) / 2 and log[N][0] ==current_term:
+            commit_index = N
+
     if response:
         for key, value in fileinfomap.items():
             xmlrpc.client.ServerProxy("http://" + serverid).surfstore.updatefile(key, value[0], value[1])
@@ -222,6 +236,7 @@ def answerAppendEntries(leader_term, fileinfomap, serverid, prev_log_index, prev
                 log[prev_log_index + i:] = list()
                 for j in range(i, len(entries)):
                     log.append(entries[j])
+                break
 
         if leader_commit > commit_index:
             commit_index = min(leader_commit, len(log))
@@ -235,8 +250,6 @@ def answerAppendEntries(leader_term, fileinfomap, serverid, prev_log_index, prev
     # reset the election timeout
     timer.reset()
     timer.set_election_timeout()
-
-
 
     return True, current_term
 
@@ -334,6 +347,7 @@ def raft():
                         "http://" + serverid).surfstore.get_commit_index()
                     xmlrpc.client.ServerProxy(
                         "http://" + serverid).surfstore.reset_next_and_match_index(n, new_commit_index)
+
 
 if __name__ == "__main__":
     try:
