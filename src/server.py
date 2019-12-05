@@ -74,18 +74,22 @@ def hasblocks(hashlist):
 def getfileinfomap():
     global majority_live
     """Gets the fileinfo map"""
-
+    start_time = time.time()
     if not isLeader():
         raise Exception("Not the leader")
     else:
         # block if the leader is crashed
         while isCrashed():
+            if time.time() - start_time > 2.5:
+                return True
             pass
         print("GetFileInfoMap()")
         log.append([current_term, [1]])
 
         # block until the majority of nodes alive alive
         while majority_live < (1 + num_servers) / 2:
+            if time.time() - start_time > 2.5:
+                return True
             pass
         print("successful get rid of block!!!")
         return fileinfomap
@@ -96,11 +100,14 @@ def updatefile(filename, version, hashlist):
     global current_term
     global majority_live
     """Updates a file's fileinfo entry"""
+    start_time = time.time()
     if not isLeader():
         raise Exception("Not the leader")
     else:
         # block if the leader is crashed
         while isCrashed():
+            if time.time() - start_time > 2.5:
+                return True
             pass
         print("UpdateFile(" + filename + ")")
         fileinfomap[filename] = [version, hashlist]
@@ -108,6 +115,8 @@ def updatefile(filename, version, hashlist):
 
         # block until the majority of nodes alive
         while majority_live < (1 + num_servers) / 2:
+            if time.time() - start_time > 2.5:
+                return True
             pass
         return True
 
