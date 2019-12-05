@@ -110,9 +110,6 @@ def updatefile(filename, version, hashlist):
                 return True
             pass
         print("UpdateFile(" + filename + ")")
-
-        if version != fileinfomap[filename][0] + 1:
-            return False
         fileinfomap[filename] = [version, hashlist]
         log.append([current_term, [2, filename, version, hashlist]])
 
