@@ -48,5 +48,11 @@ where the argument is the server hostport
 | AppendEntries     | Replicates log entries; serves as a heartbeat mechanism| server | Should return an “isCrashed” error; procedure has no effect if server is crashed|
 | RequestVote     | Used to implement leader election     |   server |Should return an “isCrashed” error; procedure has no effect if server is crashed|
 | getfileinfomap() | Returns metadata from the filesystem     |    client | If the node is the leader, and if a majority of the nodes are working, should return the correct answer; if a majority of the nodes are crashed, should block until a majority recover.  If not the leader, should indicate an error back to the client |
+| updatefile() | Updates a file’s metadata | client | If the node is the leader, and if a majority of the nodes are working, should return the correct answer; if a majority of the nodes are crashed, should block until a majority |
+| tester_getversion() | Returns the version of the given file, even when the server is crashed | client | Returns the version of the given file in the server’s metadata map, even if the server is in a crashed state |
+| isleader() | True if the server thinks it is a leader | client | Always returns the correct answer |
+| crash() | Cause the server to enter a “crashed” state | tester | Crashing a server , if that is already crashed has no effect |
+| restore() | Causes the server to no longer be crashed | tester | Causes the server to recover and no longer be crashed |
+| iscrashed() | True if the server is in a crashed state | tester | Always returns the correct answer |
 
 
