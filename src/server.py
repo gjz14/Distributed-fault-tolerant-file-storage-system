@@ -110,7 +110,7 @@ def updatefile(filename, version, hashlist):
                 return True
             continue
         print("UpdateFile(" + filename + ")")
-        fileinfomap[filename] = [version, hashlist]
+
         log.append([current_term, [2, filename, version, hashlist]])
 
         # block until the majority of nodes alive
@@ -118,6 +118,9 @@ def updatefile(filename, version, hashlist):
             if time.time() - start_time > 2.5:
                 return True
             continue
+        # update leader fileinfomap after the majority of followers respond 
+        fileinfomap[filename] = [version, hashlist]
+        print("Leader update file success")
         return True
 
 
@@ -316,15 +319,14 @@ def answerAppendEntries(leader_term, leader_fileinfomap, prev_log_index, prev_lo
         if leader_commit > commit_index:
             commit_index = min(leader_commit, len(log) - 1)
 
-        for key, value in leader_fileinfomap.items():
-            updatefile_follower(key, value[0], value[1])
+    for key, value in leader_fileinfomap.items():
+        updatefile_follower(key, value[0], value[1])
 
-        print("update finished as a follower " + str(leader_fileinfomap))
+
     # print("Follower log: ", log)
     # reset the election timeout
     timer.reset()
     timer.set_election_timeout()
-
     return True, current_term
 
 
