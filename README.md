@@ -41,6 +41,12 @@ $ run-tester.sh localhost:9001
 
 where the argument is the server hostport
 
+## RAFT implementation
+### Leader election
+
+
+### Log replication
+
 ## API summary
 
 | RPC call        | Description           | Who calls this?  |  Response during “crashed” state |
