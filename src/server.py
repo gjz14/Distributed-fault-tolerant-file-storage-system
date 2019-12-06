@@ -215,7 +215,7 @@ def answerVote(candidate_id, candidate_term, last_log_index, last_log_term):
         if current_term < candidate_term and (voted_for == -1 or voted_for == candidate_id) and last_log_index >= len(log) - 1:
             current_term = candidate_term
             status = 0
-            voted_for = candidate_id
+            voted_for = -1
             return True, current_term
 
         else:
