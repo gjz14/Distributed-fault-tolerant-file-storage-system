@@ -32,3 +32,8 @@ To run the test, simple using command like:
 $ run-tester.sh localhost:9001
 
 where the argument is the server hostport
+
+## API summary
+
+
+
