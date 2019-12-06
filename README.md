@@ -12,17 +12,25 @@ Would start the server with a configuration file of myconfig.txt.  It would tell
 The server will receive a configuration file as part of its initialization.  The format is as follows:
 
 M: number of servers
+
 metadata0: <host>:<port>
+  
 metadata1: <host>:<port>
+  
 metadata2: <host>:<port>
 
 As an example:
 
 M: 5
+
 metadata0: localhost:9001
+
 metadata1: localhost:9002
+
 metadata2: localhost:9003
+
 metadata3: localhost:9004
+
 metadata4: localhost:9005
 
 ## How to run tests
