@@ -43,5 +43,10 @@ where the argument is the server hostport
 
 ## API summary
 
+| RPC call        | Description           | Who calls this?  |  Response during “crashed” state
+| ------------- |:-------------:| -----:|
+| AppendEntries     | Replicates log entries; serves as a heartbeat mechanism| server | Should return an “isCrashed” error; procedure has no effect if server is crashed
+| RequestVote     | Used to implement leader election     |   server |Should return an “isCrashed” error; procedure has no effect if server is crashed
+| getfileinfomap() | Returns metadata from the filesystem     |    client | If the node is the leader, and if a majority of the nodes are working, should return the correct answer; if a majority of the nodes are crashed, should block until a majority recover.  If not the leader, should indicate an error back to the client
 
 
