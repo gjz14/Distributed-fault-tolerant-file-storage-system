@@ -191,6 +191,7 @@ def requestVote(serverid, term):
         elif external_term > current_term:
             current_term = external_term
             status = 0
+
     except:
         pass
 
@@ -379,7 +380,7 @@ def raft():
     while True:
         # if it is a leader, just send heartbeats
         if status == 2:
-            timer.set_heartbeat_timeout(150)
+            timer.set_heartbeat_timeout(250)
 
             if timer.timecount() > timer.timeout:
                 timer.reset()
@@ -476,6 +477,7 @@ if __name__ == "__main__":
         server.register_function(appendEntries, "surfstore.appendEntries")
         server.register_function(tester_getversion, "surfstore.tester_getversion")
 
+        server.register_function(updatefile_follower, "surfstore.updatefile_follower")
         server.register_function(reset_next_and_match_index, "surfstore.reset_next_and_match_index")
         server.register_function(get_commit_index, "surfstore.get_commit_index")
         server.register_function(answerVote, "surfstore.answerVote")
