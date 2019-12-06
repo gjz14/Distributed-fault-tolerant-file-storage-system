@@ -80,16 +80,16 @@ def getfileinfomap():
     else:
         # block if the leader is crashed
         while isCrashed():
-            if time.time() - start_time > 2.5:
-                return True
+            # if time.time() - start_time > 2.5:
+            #     return True
             pass
         print("GetFileInfoMap()")
         log.append([current_term, [1]])
 
         # block until the majority of nodes alive alive
         while majority_live < (1 + num_servers) / 2:
-            if time.time() - start_time > 2.5:
-                return True
+            # if time.time() - start_time > 2.5:
+            #     return True
             pass
         print("successful get rid of block!!!")
         return fileinfomap
