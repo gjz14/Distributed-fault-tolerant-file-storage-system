@@ -127,9 +127,7 @@ def updatefile(filename, version, hashlist):
 def updatefile_follower(filename, version, hashlist):
     """Updates a file's fileinfo entry"""
 
-    print("follower UpdateFile(" + filename + ")")
     fileinfomap[filename] = [version, hashlist]
-    print(fileinfomap)
     return True
 
 
@@ -179,7 +177,7 @@ def isCrashed():
 
 
 # Requests vote from this server to become the leader
-def requestVote(serverid, term):
+def requestVote(my_id, serverid, term):
     """Requests vote to be the leader"""
     if is_crashed:
         raise Exception("Crash Error")
@@ -189,7 +187,7 @@ def requestVote(serverid, term):
     global log
     try:
         c = xmlrpc.client.ServerProxy("http://" + serverid)
-        response, external_term = c.surfstore.answerVote(serverid, term, len(log) - 1, log[len(log) - 1][0])
+        response, external_term = c.surfstore.answerVote(my_id, term, len(log) - 1)
         if response:
             vote_counter += 1
         # downgrade a candidate node to a follower node
@@ -202,7 +200,7 @@ def requestVote(serverid, term):
     return True
 
 
-def answerVote(candidate_id, candidate_term, last_log_index, last_log_term):
+def answerVote(candidate_id, candidate_term, last_log_index):
     if is_crashed:
         return False, -1
     global current_term
@@ -215,12 +213,13 @@ def answerVote(candidate_id, candidate_term, last_log_index, last_log_term):
     timer.set_election_timeout()
 
     try:
-        if current_term < candidate_term and (voted_for == -1 or voted_for == candidate_id) and last_log_index >= len(log) - 1:
+        if current_term > candidate_term:
+            return False, current_term
+        if current_term < candidate_term or (voted_for == "Nobody" and last_log_index >= len(log) - 1):
             current_term = candidate_term
             status = 0
-            voted_for = -1
+            voted_for = candidate_id
             return True, current_term
-
         else:
             print("I won't vote")
             return False, current_term
@@ -241,7 +240,7 @@ def appendEntries(serverid, term, fileinfomap, i):
     global commit_index
     global majority_live
     entries = log[next_index[i]:]
-    prev_log_index = next_index[i] - 1           # TODO: Not sure
+    prev_log_index = next_index[i] - 1          
     prev_log_term = log[prev_log_index][0]
     try:
         response, external_term = xmlrpc.client.ServerProxy("http://" + serverid).surfstore.\
@@ -254,7 +253,7 @@ def appendEntries(serverid, term, fileinfomap, i):
         if external_term == -1:   # follower is crashed
             return False
         if response and entries != 0:
-            # TODO: update nextIndex and matchIndex for the follower i
+            # update nextIndex and matchIndex for the follower i
             match_index[i] = len(log) - 1
             next_index[i] = len(log)
 
@@ -339,12 +338,12 @@ def get_commit_index():
     return commit_index
 
 
-def reset_next_and_match_index(n, commit_index):
+def reset_next_and_match_index(n, log):
     global match_index
     global next_index
     match_index = [0 for _ in range(n)]
     print(match_index)
-    next_index = [commit_index for _ in range(n)]
+    next_index = [len(log) for _ in range(n)]
 
     print(next_index)
 
@@ -380,6 +379,7 @@ def raft():
     global majority_live
     global current_term
     global vote_counter
+    global voted_for
     global timer
     global is_update_file
     timer = TimeHandler()
@@ -404,17 +404,24 @@ def raft():
             if timer.timecount() > timer.timeout:
                 timer.reset()
                 timer.set_election_timeout()
-                status = 1  # make it an candidate
+                
+                # MAKE IT AN CANDIDATE 
+                status = 1  
                 current_term += 1
-                vote_counter = 1  # vote for its self
+                # vote for itself
+                vote_counter = 1  
+                voted_for = my_id
+
+
                 # print("I am " + str(host) + ":" + str(port) + ",  I am requesting for vote, my current term is: " + str(
                 #     current_term))
                 thread_list = []
                 for s in serverlist:
-                    thread_list.append(threading.Thread(target=requestVote, args=(s, current_term)))
+                    thread_list.append(threading.Thread(target=requestVote, args=(my_id, s, current_term)))
                     thread_list[-1].start()
                 for t in thread_list:
                     t.join()
+
                 # get majority votes, become leader
                 # print(num_servers, vote_counter)
                 if vote_counter > num_servers / 2:
@@ -422,9 +429,7 @@ def raft():
                     print("A new leader " + str(host) + ":" + str(port) + " in term: " + str(current_term))
                     #
                     n = len(serverlist)
-
-                    new_commit_index = get_commit_index()
-                    reset_next_and_match_index(n, new_commit_index)
+                    reset_next_and_match_index(n, log)
 
 
 if __name__ == "__main__":
@@ -444,11 +449,14 @@ if __name__ == "__main__":
         # maxnum is maximum number of servers
         maxnum, host, port = readconfig(config, servernum)
 
+        # My id
+        my_id = host + ":" + str(port)
+
         hashmap = dict()
 
         fileinfomap = dict()
 
-        voted_for = -1
+        voted_for = "Nobody"
         log = list()
         log.append([1, []])
         last_applied = 0
