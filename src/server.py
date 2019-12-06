@@ -149,9 +149,11 @@ def isLeader():
 def crash():
     """Crashes this metadata store"""
     global is_crashed
+    global vote_counter
     global status
     is_crashed = True
     status = 0          # When crash, force leader to be follower
+    vote_counter = 0
     print("Crash()")
     return True
 
@@ -192,6 +194,7 @@ def requestVote(my_id, serverid, term):
         elif external_term > current_term:
             current_term = external_term
             status = 0
+            vote_counter = 0
     except:
         pass
 
@@ -205,12 +208,14 @@ def answerVote(candidate_id, candidate_term, last_log_index):
     global timer
     global status
     global voted_for
+    global vote_counter 
     global log
     try:
         if current_term > candidate_term:
             return False, current_term
         if current_term < candidate_term:
             status = 0
+            vote_counter = 0
             current_term = candidate_term
             voted_for = "Nobody"
         if voted_for == "Nobody" and last_log_index >= len(log) - 1:
@@ -237,6 +242,7 @@ def appendEntries(serverid, term, fileinfomap, i):
     global match_index
     global next_index
     global commit_index
+    global vote_counter
     global majority_live
     entries = log[next_index[i]:]
     prev_log_index = next_index[i] - 1          
@@ -263,6 +269,7 @@ def appendEntries(serverid, term, fileinfomap, i):
             if current_term < external_term:
                 print("I am not leader now!!!!")
                 current_term = external_term
+                vote_counter = 0
                 status = 0
             else:
                 next_index[i] -= 1
@@ -280,6 +287,10 @@ def answerAppendEntries(leader_term, leader_fileinfomap, prev_log_index, prev_lo
 
     global commit_index
     global log
+    global timer
+    global status
+    global vote_counter
+    global current_term
 
     if current_term > leader_term:
         return False, current_term
@@ -309,6 +320,9 @@ def answerAppendEntries(leader_term, leader_fileinfomap, prev_log_index, prev_lo
         print("Follower update commit index to " + str(commit_index))
     timer.reset()
     timer.set_election_timeout()
+    status = 0
+    vote_counter = 0
+    current_term = leader_term
     return True, current_term
 
 
