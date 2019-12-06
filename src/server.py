@@ -108,7 +108,7 @@ def updatefile(filename, version, hashlist):
         while isCrashed():
             if time.time() - start_time > 2.5:
                 return True
-            pass
+            continue
         print("UpdateFile(" + filename + ")")
         fileinfomap[filename] = [version, hashlist]
         log.append([current_term, [2, filename, version, hashlist]])
@@ -117,7 +117,7 @@ def updatefile(filename, version, hashlist):
         while majority_live < (1 + num_servers) / 2:
             if time.time() - start_time > 2.5:
                 return True
-            pass
+            continue
         return True
 
 def updatefile_follower(filename, version, hashlist):
@@ -191,7 +191,6 @@ def requestVote(serverid, term):
         elif external_term > current_term:
             current_term = external_term
             status = 0
-
     except:
         pass
 

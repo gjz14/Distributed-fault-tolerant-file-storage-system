@@ -13,8 +13,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/server.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="280">
-              <caret line="192" column="22" lean-forward="true" selection-start-line="192" selection-start-column="22" selection-end-line="192" selection-end-column="22" />
+            <state relative-caret-position="-348">
+              <caret line="98" column="14" selection-start-line="98" selection-start-column="4" selection-end-line="98" selection-end-column="14" />
               <folding>
                 <element signature="e#0#44#0" expanded="true" />
                 <element signature="e#1093#1191#0" />
@@ -34,8 +34,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/tester.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="149">
-              <caret line="20" column="8" selection-start-line="20" selection-start-column="8" selection-end-line="20" selection-end-column="8" />
+            <state relative-caret-position="190">
+              <caret line="21" column="37" lean-forward="true" selection-start-line="21" selection-start-column="27" selection-end-line="21" selection-end-column="37" />
               <folding>
                 <element signature="e#0#15#0" expanded="true" />
               </folding>
@@ -96,14 +96,14 @@
       <find>crash</find>
       <find>status</find>
       <find>isleader</find>
-      <find>fileinfomap</find>
-      <find>updatefile</find>
       <find>50</find>
       <find>getfile</find>
       <find>tester_getversion</find>
       <find>tester_get</find>
       <find>requestvote</find>
       <find>requestVote</find>
+      <find>fileinfomap</find>
+      <find>updatefile</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -219,18 +219,18 @@
       <updated>1575426430478</updated>
       <workItem from="1575426431729" duration="340000" />
       <workItem from="1575426778068" duration="223000" />
-      <workItem from="1575427036553" duration="53197000" />
+      <workItem from="1575427036553" duration="54188000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="53760000" />
+    <option name="totallyTimeSpent" value="54751000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="1" y="23" width="1280" height="709" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.18659128" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.18659128" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
@@ -244,7 +244,7 @@
       <window_info anchor="bottom" id="Version Control" order="8" />
       <window_info anchor="bottom" id="Database Changes" order="9" />
       <window_info anchor="bottom" id="Event Log" order="10" side_tool="true" />
-      <window_info active="true" anchor="bottom" id="Terminal" order="11" visible="true" weight="0.15397082" />
+      <window_info anchor="bottom" id="Terminal" order="11" visible="true" weight="0.22528364" />
       <window_info anchor="bottom" id="Python Console" order="12" />
       <window_info anchor="right" id="Commander" order="0" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
@@ -300,8 +300,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/tester.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="149">
-          <caret line="20" column="8" selection-start-line="20" selection-start-column="8" selection-end-line="20" selection-end-column="8" />
+        <state relative-caret-position="190">
+          <caret line="21" column="37" lean-forward="true" selection-start-line="21" selection-start-column="27" selection-end-line="21" selection-end-column="37" />
           <folding>
             <element signature="e#0#15#0" expanded="true" />
           </folding>
@@ -310,8 +310,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/server.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="280">
-          <caret line="192" column="22" lean-forward="true" selection-start-line="192" selection-start-column="22" selection-end-line="192" selection-end-column="22" />
+        <state relative-caret-position="-348">
+          <caret line="98" column="14" selection-start-line="98" selection-start-column="4" selection-end-line="98" selection-end-column="14" />
           <folding>
             <element signature="e#0#44#0" expanded="true" />
             <element signature="e#1093#1191#0" />
