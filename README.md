@@ -8,7 +8,7 @@ $ run-server.sh myconfig.txt 3
 
 Would start the server with a configuration file of myconfig.txt.  It would tell the newly started server that it is server #3 in the set of processes.
 
-##Configuration file
+## Configuration file
 The server will receive a configuration file as part of its initialization.  The format is as follows:
 
 M: number of servers
@@ -25,7 +25,7 @@ metadata2: localhost:9003
 metadata3: localhost:9004
 metadata4: localhost:9005
 
-##How to run tests
+## How to run tests
 The tester.py under the src directory is used to test the file system by sending requests to the servers as a client.
 To run the test, simple using command like:
 
