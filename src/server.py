@@ -20,8 +20,8 @@ class threadedXMLRPCServer(ThreadingMixIn, SimpleXMLRPCServer):
 
 class TimeHandler():
     def __init__(self):
-        self.election_lower = 500
-        self.election_higher = 1000
+        self.election_lower = 1500
+        self.election_higher = 3000
         self.start = int(time.time() * 1000)
         self.timeout = 0
 
@@ -118,13 +118,11 @@ def updatefile(filename, version, hashlist):
             if time.time() - start_time > 2.5:
                 return True
             continue
-        # update leader fileinfomap after the majority of followers respond 
-        fileinfomap[filename] = [version, hashlist]
-        print("Leader update file success")
+        print("Leader reply to client success")
         return True
 
 
-def updatefile_follower(filename, version, hashlist):
+def updatefile_allserver(filename, version, hashlist):
     """Updates a file's fileinfo entry"""
 
     fileinfomap[filename] = [version, hashlist]
@@ -208,17 +206,18 @@ def answerVote(candidate_id, candidate_term, last_log_index):
     global status
     global voted_for
     global log
-    # reset the election timeout
-    timer.reset()
-    timer.set_election_timeout()
-
     try:
         if current_term > candidate_term:
             return False, current_term
-        if current_term < candidate_term or (voted_for == "Nobody" and last_log_index >= len(log) - 1):
-            current_term = candidate_term
+        if current_term < candidate_term:
             status = 0
+            current_term = candidate_term
+            voted_for = "Nobody"
+        if voted_for == "Nobody" and last_log_index >= len(log) - 1:
             voted_for = candidate_id
+            # reset the election timeout
+            timer.reset()
+            timer.set_election_timeout()
             return True, current_term
         else:
             print("I won't vote")
@@ -226,7 +225,7 @@ def answerVote(candidate_id, candidate_term, last_log_index):
     except:
         pass
 
-    # Updates fileinfomap
+    
 
 
 def appendEntries(serverid, term, fileinfomap, i):
@@ -252,22 +251,12 @@ def appendEntries(serverid, term, fileinfomap, i):
                                 commit_index)
         if external_term == -1:   # follower is crashed
             return False
-        if response and entries != 0:
-            # update nextIndex and matchIndex for the follower i
+        if response and len(entries) != 0:
+            print( "update nextIndex and matchIndex for the follower "+str(i))
             match_index[i] = len(log) - 1
             next_index[i] = len(log)
 
-            # Control commit_index
-            N = commit_index + 1
-            while N < len(log):
-                flag = 0
-                for index in match_index:
-                    if index >= N:
-                        flag += 1
-                if flag >= len(match_index) / 2 and log[N][0] == current_term:
-                    commit_index = N
-                    break
-                N += 1
+
 
         if not response:
             # downgrade a leader node to a follower node
@@ -299,7 +288,7 @@ def answerAppendEntries(leader_term, leader_fileinfomap, prev_log_index, prev_lo
         return False, current_term
 
     if len(entries) != 0:
-        print("ready to update fileinfomap as a follower "+str(leader_fileinfomap))
+        print("ready to update log as a follower "+str(entries))
         has_conflict = False
         for i in range(len(entries)):
             if prev_log_index + 1 + i < len(log):
@@ -315,21 +304,17 @@ def answerAppendEntries(leader_term, leader_fileinfomap, prev_log_index, prev_lo
             log[prev_log_index + 1:] = list()
             log.extend(entries)
 
-        if leader_commit > commit_index:
-            commit_index = min(leader_commit, len(log) - 1)
-
-    for key, value in leader_fileinfomap.items():
-        updatefile_follower(key, value[0], value[1])
-
-
-    # print("Follower log: ", log)
-    # reset the election timeout
+    if leader_commit > commit_index:
+        commit_index = min(leader_commit, len(log) - 1)
+        print("Follower update commit index to " + str(commit_index))
     timer.reset()
     timer.set_election_timeout()
     return True, current_term
 
 
 def tester_getversion(filename):
+    if filename not in fileinfomap:
+        return 0
     return fileinfomap[filename][0]
 
 
@@ -377,14 +362,24 @@ def readconfig(config, servernum):
 def raft():
     global status
     global majority_live
+    global commit_index
     global current_term
     global vote_counter
     global voted_for
     global timer
-    global is_update_file
+    global last_applied
+    global log
     timer = TimeHandler()
     timer.set_election_timeout()
     while True:
+        # COMMIT UNAPPLIED LOGS
+        if commit_index > last_applied:
+            last_applied += 1
+            filename = log[last_applied][1][1]
+            version = log[last_applied][1][2]
+            hashlist = log[last_applied][1][3]
+            updatefile_allserver(filename, version, hashlist)
+            print("Commit file: ",filename)
         # if it is a leader, just send heartbeats
         if status == 2:
             timer.set_heartbeat_timeout(250)
@@ -398,7 +393,19 @@ def raft():
                     thread_list[-1].start()
                 for t in thread_list:
                     t.join()
-            is_update_file = False
+                # Control commit_index
+                N = commit_index + 1
+                while N < len(log):
+                    flag = 0
+                    for index in match_index:
+                        if index >= N:
+                            flag += 1
+                    if flag >= len(match_index) / 2 and log[N][0] == current_term:
+                        commit_index = N
+                        print("Leader update commit index to " + str(commit_index))
+                        break
+                    N += 1
+                
         else:
             # election time out
             if timer.timecount() > timer.timeout:
@@ -493,7 +500,7 @@ if __name__ == "__main__":
         server.register_function(appendEntries, "surfstore.appendEntries")
         server.register_function(tester_getversion, "surfstore.tester_getversion")
 
-        server.register_function(updatefile_follower, "surfstore.updatefile_follower")
+        server.register_function(updatefile_allserver, "surfstore.updatefile_allserver")
         server.register_function(reset_next_and_match_index, "surfstore.reset_next_and_match_index")
         server.register_function(get_commit_index, "surfstore.get_commit_index")
         server.register_function(answerVote, "surfstore.answerVote")
