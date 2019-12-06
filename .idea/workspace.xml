@@ -13,8 +13,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/server.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-348">
-              <caret line="98" column="14" selection-start-line="98" selection-start-column="4" selection-end-line="98" selection-end-column="14" />
+            <state relative-caret-position="95">
+              <caret line="214" column="96" selection-start-line="214" selection-start-column="96" selection-end-line="214" selection-end-column="96" />
               <folding>
                 <element signature="e#0#44#0" expanded="true" />
                 <element signature="e#1093#1191#0" />
@@ -74,8 +74,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>reset_next_and_match_index</find>
-      <find>update</find>
       <find>islead</find>
       <find>fileinfo</find>
       <find>log</find>
@@ -104,6 +102,8 @@
       <find>requestVote</find>
       <find>fileinfomap</find>
       <find>updatefile</find>
+      <find>vote</find>
+      <find>current_term</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -219,18 +219,18 @@
       <updated>1575426430478</updated>
       <workItem from="1575426431729" duration="340000" />
       <workItem from="1575426778068" duration="223000" />
-      <workItem from="1575427036553" duration="54188000" />
+      <workItem from="1575427036553" duration="55389000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="54751000" />
+    <option name="totallyTimeSpent" value="55952000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="1" y="23" width="1280" height="709" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.18659128" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.18659128" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
@@ -244,7 +244,7 @@
       <window_info anchor="bottom" id="Version Control" order="8" />
       <window_info anchor="bottom" id="Database Changes" order="9" />
       <window_info anchor="bottom" id="Event Log" order="10" side_tool="true" />
-      <window_info anchor="bottom" id="Terminal" order="11" visible="true" weight="0.22528364" />
+      <window_info active="true" anchor="bottom" id="Terminal" order="11" visible="true" weight="0.22528364" />
       <window_info anchor="bottom" id="Python Console" order="12" />
       <window_info anchor="right" id="Commander" order="0" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
@@ -310,8 +310,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/server.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-348">
-          <caret line="98" column="14" selection-start-line="98" selection-start-column="4" selection-end-line="98" selection-end-column="14" />
+        <state relative-caret-position="95">
+          <caret line="214" column="96" selection-start-line="214" selection-start-column="96" selection-end-line="214" selection-end-column="96" />
           <folding>
             <element signature="e#0#44#0" expanded="true" />
             <element signature="e#1093#1191#0" />

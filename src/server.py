@@ -120,6 +120,7 @@ def updatefile(filename, version, hashlist):
             continue
         return True
 
+
 def updatefile_follower(filename, version, hashlist):
     """Updates a file's fileinfo entry"""
 
@@ -182,9 +183,10 @@ def requestVote(serverid, term):
     global vote_counter
     global current_term
     global status
+    global log
     try:
         c = xmlrpc.client.ServerProxy("http://" + serverid)
-        response, external_term = c.surfstore.answerVote(term)
+        response, external_term = c.surfstore.answerVote(serverid, term, len(log) - 1, log[len(log) - 1][0])
         if response:
             vote_counter += 1
         # downgrade a candidate node to a follower node
@@ -197,21 +199,25 @@ def requestVote(serverid, term):
     return True
 
 
-def answerVote(candidate_term):
+def answerVote(candidate_id, candidate_term, last_log_index, last_log_term):
     if is_crashed:
         return False, -1
     global current_term
     global timer
     global status
+    global voted_for
+    global log
     # reset the election timeout
     timer.reset()
     timer.set_election_timeout()
 
     try:
-        if current_term < candidate_term:
+        if current_term < candidate_term and (voted_for == -1 or voted_for == candidate_id) and last_log_index >= len(log) - 1:
             current_term = candidate_term
             status = 0
+            voted_for = candidate_id
             return True, current_term
+
         else:
             print("I won't vote")
             return False, current_term
@@ -440,6 +446,7 @@ if __name__ == "__main__":
 
         fileinfomap = dict()
 
+        voted_for = -1
         log = list()
         log.append([1, []])
         last_applied = 0
