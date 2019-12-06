@@ -383,9 +383,13 @@ def raft():
     global timer
     global last_applied
     global log
+    global is_crashed
     timer = TimeHandler()
     timer.set_election_timeout()
     while True:
+        while is_crashed:
+            timer.reset()
+            timer.set_election_timeout()
         # COMMIT UNAPPLIED LOGS
         if commit_index > last_applied:
             last_applied += 1
@@ -393,7 +397,7 @@ def raft():
             version = log[last_applied][1][2]
             hashlist = log[last_applied][1][3]
             updatefile_allserver(filename, version, hashlist)
-            print("Commit file: ",filename)
+            print("Commit file: ",filename, version)
         # if it is a leader, just send heartbeats
         if status == 2:
             timer.set_heartbeat_timeout(250)
